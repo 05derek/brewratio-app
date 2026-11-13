@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">BrewRatio</string>
+    <string name="tab_signin">Sign In</string>
+    <string name="tab_signup">Sign Up</string>
+    <string name="label_email">Email</string>
+    <string name="hint_email">you@example.com</string>
+    <string name="label_password">Password</string>
+    <string name="hint_password">••••••••</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="btn_signin">Sign In</string>
+    <string name="btn_signup">Sign Up</string>
+    <string name="prompt_no_account">Don\'t have an account? </string>
+    <string name="prompt_have_account">Already have an account? </string>
+    <string name="action_signup">Sign up</string>
+    <string name="action_signin">Sign in</string>
+    <string name="error_empty_fields">Email dan password tidak boleh kosong!</string>
+    <!-- (Kode sebelumnya tetap ada, tambahkan baris berikut di dalam <resources>) -->
+    <string name="error_invalid_email">Format email tidak valid (harus mengandung karakter @)</string>
+    <string name="error_invalid_password">Password minimal 8 karakter serta mengandung huruf dan angka</string>
+</resources>
