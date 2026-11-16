@@ -17,4 +17,10 @@
     <!-- (Kode sebelumnya tetap ada, tambahkan baris berikut di dalam <resources>) -->
     <string name="error_invalid_email">Format email tidak valid (harus mengandung karakter @)</string>
     <string name="error_invalid_password">Password minimal 8 karakter serta mengandung huruf dan angka</string>
+
+    <!-- Tambahkan string berikut untuk alur Login -> Home -->
+    <string name="login_loading">Memverifikasi akun…</string>
+    <string name="home_welcome_title">Selamat Datang di BrewRatio</string>
+    <string name="home_subtitle">Siapkan rasio seduhan terbaikmu hari ini.</string>
+    <string name="cd_brand_logo">Logo BrewRatio</string>
 </resources>

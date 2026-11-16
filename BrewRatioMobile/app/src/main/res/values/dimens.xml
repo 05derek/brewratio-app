@@ -22,4 +22,8 @@
     <!-- Component Sizes -->
     <dimen name="button_height">50.dp</dimen>
     <dimen name="border_width_thin">1.dp</dimen>
+    <!-- Ukuran indikator loading di dalam tombol saat proses autentikasi -->
+    <dimen name="loading_indicator_size">20.dp</dimen>
+    <!-- Ketebalan garis animasi lingkaran loading -->
+    <dimen name="loading_stroke_width">2.dp</dimen>
 </resources>
