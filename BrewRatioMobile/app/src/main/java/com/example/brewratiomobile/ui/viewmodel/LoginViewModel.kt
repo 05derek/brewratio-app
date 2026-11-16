@@ -4,6 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
     var isSignInSelected by mutableStateOf(true)
@@ -25,6 +28,10 @@ class LoginViewModel : ViewModel() {
     var generalError by mutableStateOf<String?>(null)
         private set
 
+    // [BARU] State untuk mengontrol indikator loading pada tombol dan mencegah double-click
+    var isLoading by mutableStateOf(false)
+        private set
+
     fun onEmailChanged(newEmail: String) {
         email = newEmail
         emailError = null
@@ -38,13 +45,16 @@ class LoginViewModel : ViewModel() {
     }
 
     fun toggleAuthMode(isSignIn: Boolean) {
+        // Cegah perpindahan tab saat proses loading sedang berjalan
+        if (isLoading) return
+
         isSignInSelected = isSignIn
         emailError = null
         passwordError = null
         generalError = null
     }
 
-    // Fungsi Validasi Sesuai SOP
+    // Fungsi Validasi Sesuai SOP + Simulasi Loading sebelum Transisi Layar
     fun validateAndSubmit(
         emptyMsg: String,
         invalidEmailMsg: String,
@@ -52,6 +62,9 @@ class LoginViewModel : ViewModel() {
         onSuccessLogin: (String, String) -> Unit,
         onSuccessRegister: (String, String) -> Unit
     ) {
+        // Abaikan klik jika proses autentikasi masih berjalan
+        if (isLoading) return
+
         var isValid = true
 
         // 1. Cek Kosong
@@ -73,12 +86,22 @@ class LoginViewModel : ViewModel() {
             isValid = false
         }
 
-        // Jika semua validasi lolos
+        // Jika semua validasi lolos, jalankan proses loading sebelum berpindah layar
         if (isValid) {
-            if (isSignInSelected) {
-                onSuccessLogin(email, password)
-            } else {
-                onSuccessRegister(email, password)
+            viewModelScope.launch {
+                isLoading = true
+
+                // Simulasi jeda jaringan/autentikasi agar animasi loading terlihat halus.
+                // Nantinya baris delay() ini tinggal diganti dengan pemanggilan API dari folder backend.
+                delay(800)
+
+                isLoading = false
+
+                if (isSignInSelected) {
+                    onSuccessLogin(email, password)
+                } else {
+                    onSuccessRegister(email, password)
+                }
             }
         }
     }
