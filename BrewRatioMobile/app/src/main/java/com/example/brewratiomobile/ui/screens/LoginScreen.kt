@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.brewratiomobile.R
 import com.example.brewratiomobile.ui.components.CoffeeLogo
 import com.example.brewratiomobile.ui.theme.CopperBrown
@@ -30,9 +31,8 @@ import com.example.brewratiomobile.ui.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
-    onLoginSuccess: (String, String) -> Unit,
-    onRegisterSubmit: (String, String) -> Unit
+    onNavigateToHome: () -> Unit,
+    viewModel: LoginViewModel = viewModel()
 ) {
     val emptyFieldsError = stringResource(id = R.string.error_empty_fields)
     val invalidEmailError = stringResource(id = R.string.error_invalid_email)
@@ -88,6 +88,7 @@ fun LoginScreen(
 
                 AuthTabRow(
                     isSignInSelected = viewModel.isSignInSelected,
+                    enabled = !viewModel.isLoading,
                     onTabSelected = { viewModel.toggleAuthMode(it) }
                 )
 
@@ -99,6 +100,7 @@ fun LoginScreen(
                     onValueChange = { viewModel.onEmailChanged(it) },
                     placeholder = stringResource(id = R.string.hint_email),
                     keyboardType = KeyboardType.Email,
+                    enabled = !viewModel.isLoading,
                     isError = viewModel.emailError != null,
                     errorMessage = viewModel.emailError
                 )
@@ -112,6 +114,7 @@ fun LoginScreen(
                     placeholder = stringResource(id = R.string.hint_password),
                     isPassword = true,
                     keyboardType = KeyboardType.Password,
+                    enabled = !viewModel.isLoading,
                     isError = viewModel.passwordError != null,
                     errorMessage = viewModel.passwordError
                 )
@@ -119,7 +122,10 @@ fun LoginScreen(
                 if (viewModel.isSignInSelected) {
                     Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_small)))
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                        TextButton(onClick = { }) {
+                        TextButton(
+                            onClick = { },
+                            enabled = !viewModel.isLoading
+                        ) {
                             Text(
                                 text = stringResource(id = R.string.forgot_password),
                                 color = LightBeige.copy(alpha = 0.75f),
@@ -151,24 +157,39 @@ fun LoginScreen(
                             emptyMsg = emptyFieldsError,
                             invalidEmailMsg = invalidEmailError,
                             invalidPasswordMsg = invalidPasswordError,
-                            onSuccessLogin = onLoginSuccess,
-                            onSuccessRegister = onRegisterSubmit
+                            onSuccessLogin = { _, _ -> onNavigateToHome() },
+                            onSuccessRegister = { _, _ -> onNavigateToHome() }
                         )
                     },
+                    enabled = !viewModel.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(dimensionResource(id = R.dimen.button_height)),
                     shape = RoundedCornerShape(dimensionResource(id = R.dimen.button_corner_radius)),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = LightBeige,
-                        contentColor = CopperBrown
+                        contentColor = CopperBrown,
+                        disabledContainerColor = LightBeige.copy(alpha = 0.7f),
+                        disabledContentColor = CopperBrown
                     )
                 ) {
-                    Text(
-                        text = if (viewModel.isSignInSelected) stringResource(id = R.string.btn_signin) else stringResource(id = R.string.btn_signup),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = dimensionResource(id = R.dimen.text_size_button).value.sp
-                    )
+                    if (viewModel.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(dimensionResource(id = R.dimen.loading_indicator_size)),
+                            color = CopperBrown,
+                            strokeWidth = dimensionResource(id = R.dimen.loading_stroke_width)
+                        )
+                    } else {
+                        Text(
+                            text = if (viewModel.isSignInSelected) {
+                                stringResource(id = R.string.btn_signin)
+                            } else {
+                                stringResource(id = R.string.btn_signup)
+                            },
+                            fontWeight = FontWeight.Bold,
+                            fontSize = dimensionResource(id = R.dimen.text_size_button).value.sp
+                        )
+                    }
                 }
             }
         }
@@ -176,7 +197,11 @@ fun LoginScreen(
 }
 
 @Composable
-private fun AuthTabRow(isSignInSelected: Boolean, onTabSelected: (Boolean) -> Unit) {
+private fun AuthTabRow(
+    isSignInSelected: Boolean,
+    enabled: Boolean,
+    onTabSelected: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
@@ -185,7 +210,10 @@ private fun AuthTabRow(isSignInSelected: Boolean, onTabSelected: (Boolean) -> Un
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f)
         ) {
-            TextButton(onClick = { onTabSelected(true) }) {
+            TextButton(
+                onClick = { onTabSelected(true) },
+                enabled = enabled
+            ) {
                 Text(
                     text = stringResource(id = R.string.tab_signin),
                     color = if (isSignInSelected) LightBeige else LightBeige.copy(alpha = 0.5f),
@@ -202,7 +230,10 @@ private fun AuthTabRow(isSignInSelected: Boolean, onTabSelected: (Boolean) -> Un
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f)
         ) {
-            TextButton(onClick = { onTabSelected(false) }) {
+            TextButton(
+                onClick = { onTabSelected(false) },
+                enabled = enabled
+            ) {
                 Text(
                     text = stringResource(id = R.string.tab_signup),
                     color = if (!isSignInSelected) LightBeige else LightBeige.copy(alpha = 0.5f),
@@ -225,6 +256,7 @@ private fun AuthTextField(
     placeholder: String,
     isPassword: Boolean = false,
     keyboardType: KeyboardType,
+    enabled: Boolean = true,
     isError: Boolean = false,
     errorMessage: String? = null
 ) {
@@ -241,6 +273,7 @@ private fun AuthTextField(
             onValueChange = onValueChange,
             placeholder = { Text(placeholder, color = LightBeige.copy(alpha = 0.4f)) },
             singleLine = true,
+            enabled = enabled,
             isError = isError,
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
@@ -249,8 +282,10 @@ private fun AuthTextField(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = LightBeige,
                 unfocusedTextColor = LightBeige,
+                disabledTextColor = LightBeige.copy(alpha = 0.6f),
                 focusedBorderColor = if (isError) Color(0xFFE57373) else LightBeige,
                 unfocusedBorderColor = if (isError) Color(0xFFE57373).copy(alpha = 0.7f) else LightBeige.copy(alpha = 0.4f),
+                disabledBorderColor = LightBeige.copy(alpha = 0.25f),
                 errorBorderColor = Color(0xFFE57373),
                 cursorColor = LightBeige
             )
