@@ -15,33 +15,53 @@ const seedDatabase = async () => {
     const user = await User.create({
       name: 'Sal Priadi',
       email: 'salpri@gmail.com',
-      password: hashedPassword
+      password: hashedPassword,
+      bio: 'Home Brewer & Coffee Enthusiast',
+      favorite_roast: 'Medium',
+      phone_number: '08123456789'
     });
     console.log('User dibuat: salpri@gmail.com (pass: password123)');
 
     // 2. Buat Biji Kopi
     const bean1 = await CoffeeBean.create({
-      user_id: user.id, bean_name: 'Gayo Arabica', origin: 'Aceh', roast_level: 'Medium', process_type: 'Washed'
+      user_id: user.id, 
+      bean_name: 'Gayo Arabica', 
+      origin: 'Aceh', 
+      roast_level: 'Medium', 
+      process_type: 'Washed'
     });
     const bean2 = await CoffeeBean.create({
-      user_id: user.id, bean_name: 'Toraja Sapan', origin: 'Sulawesi', roast_level: 'Medium-Dark', process_type: 'Natural'
+      user_id: user.id, 
+      bean_name: 'Toraja Sapan', 
+      origin: 'Sulawesi', 
+      roast_level: 'Medium-Dark', 
+      process_type: 'Natural'
     });
 
-    // 3. Buat Metode Seduh
+    // 3. Buat Metode Seduh (Master Data V60)
     const method1 = await BrewMethod.create({
-      user_id: user.id, method_name: 'V60', default_ratio: '1:15', grind_size: 'Medium-Fine', instructions: 'Tuang 30ml air untuk blooming, diamkan 30 detik...'
+      method_name: 'V60 4:6 Method', 
+      default_ratio: 15.00, 
+      grind_size: 'Medium-Coarse', 
+      instructions: 'Bagi tuangan air menjadi 40% (rasa manis/asam) dan 60% (kekuatan rasa). Tuang dalam 5 interval 45 detik.'
+    });
+    const method2 = await BrewMethod.create({
+      method_name: 'V60 Single Pour', 
+      default_ratio: 16.00, 
+      grind_size: 'Medium-Fine', 
+      instructions: 'Tuang 50ml air untuk blooming selama 30 detik, lalu tuang sisa air secara perlahan dan konstan hingga selesai.'
     });
 
-    // 4. Buat Logbook Dummy (Menggunakan relasi Biji & Metode di atas)
+    // 4. Buat Logbook Dummy (Menggunakan relasi FK: bean_id & method_id)
     await BrewLog.create({
       user_id: user.id,
-      coffee_bean_id: bean1.id,
-      brew_method_id: method1.id,
-      coffee_weight_grams: 15,
-      water_volume_ml: 225,
+      bean_id: bean1.id,
+      method_id: method1.id,
+      coffee_weight_grams: 15.0,
+      water_volume_ml: 225.0,
       water_temp_celsius: 92,
       rating: 5,
-      flavor_notes: 'Sangat fruity, ada hints of lemon dan honey.'
+      flavor_notes: 'Sangat fruity, ada hints of lemon, peach, dan honey finish.'
     });
 
     console.log('Data Biji Kopi, Metode, dan Logbook berhasil ditambahkan!');
