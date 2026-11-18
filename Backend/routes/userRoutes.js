@@ -6,5 +6,6 @@ const authMiddleware = require('../middleware/authMiddleware');
 // Endpoint privat (Butuh Token JWT)
 router.get('/profile', authMiddleware, userController.getProfile);
 router.put('/profile', authMiddleware, userController.updateProfile);
+router.delete('/profile', authMiddleware, userController.deleteAccount);
 
 module.exports = router;
