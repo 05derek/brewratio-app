@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'brewratio_super_secret_key';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'brewratio_super_refresh_secret_key';
 
-// Fungsi Register
+// 1. Fungsi Register (Sesuai SRS REQ-1)
 const register = async (req, res) => {
   try {
     if (!req.body) {
@@ -47,7 +48,7 @@ const register = async (req, res) => {
   }
 };
 
-// Fungsi Login
+// 2. Fungsi Login (Sesuai SRS REQ-2 & Pedoman Kategori 1)
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -62,11 +63,14 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Password salah.' });
     }
 
+    // Access Token (1 hari) & Refresh Token (7 hari)
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1d' });
+    const refreshToken = jwt.sign({ id: user.id, email: user.email }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
     res.status(200).json({
       message: 'Login berhasil!',
       token,
+      refreshToken,
       data: {
         id: user.id,
         name: user.name,
@@ -79,8 +83,39 @@ const login = async (req, res) => {
   }
 };
 
-// EXPORT SEMUA FUNGSI DENGAN BENAR
+// 3. Fungsi Refresh Token (Sesuai Pedoman Kategori 1)
+const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(401).json({ message: 'Refresh token wajib disertakan.' });
+    }
+
+    jwt.verify(refreshToken, JWT_REFRESH_SECRET, async (err, decoded) => {
+      if (err) {
+        return res.status(403).json({ message: 'Refresh token tidak valid atau telah kedaluwarsa.' });
+      }
+
+      const user = await User.findByPk(decoded.id);
+      if (!user) {
+        return res.status(404).json({ message: 'Pengguna tidak ditemukan.' });
+      }
+
+      const newToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1d' });
+
+      res.status(200).json({
+        message: 'Token berhasil diperbarui!',
+        token: newToken
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Terjadi kesalahan pada server', error: error.message });
+  }
+};
+
 module.exports = {
   register,
-  login
+  login,
+  refreshToken
 };

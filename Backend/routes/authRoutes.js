@@ -8,4 +8,7 @@ router.post('/register', authController.register);
 // Endpoint: POST /api/auth/login
 router.post('/login', authController.login);
 
+// Endpoint: POST /api/auth/refresh (Pedoman Kategori 1)
+router.post('/refresh', authController.refreshToken);
+
 module.exports = router;
