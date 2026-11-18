@@ -1,0 +1,13 @@
+# --- Node.js (Backend) ---
+node_modules/
+.env
+
+# --- Android Studio (Frontend) ---
+*.iml
+.gradle/
+local.properties
+.idea/
+build/
+captures/
+.externalNativeBuild/
+.cxx/

@@ -1,7 +1,21 @@
 <resources>
     <string name="app_name">BrewRatio</string>
+    <string name="brand_name">BREWRATIO</string>
+    
+    <!-- Layar Awal (Welcome Screen) -->
+    <string name="welcome_headline">Find your favorite</string>
+    <string name="welcome_desc">Kalkulator rasio seduh presisi V60, manajemen katalog biji kopi, dan logbook evaluasi rasa dalam satu sentuhan.</string>
+    <string name="btn_lets_started">let\'s started</string>
+    
+    <!-- Layar Autentikasi (Sign In / Sign Up) -->
     <string name="tab_signin">Sign In</string>
     <string name="tab_signup">Sign Up</string>
+    <string name="login_title">Sign in</string>
+    <string name="signup_title">Sign up</string>
+    <string name="login_subtitle">We already met!</string>
+    <string name="signup_subtitle">Create your account to start brewing</string>
+    <string name="label_email_caps">EMAIL</string>
+    <string name="label_password_caps">PASSWORD</string>
     <string name="label_email">Email</string>
     <string name="hint_email">you@example.com</string>
     <string name="label_password">Password</string>
@@ -13,13 +27,16 @@
     <string name="prompt_have_account">Already have an account? </string>
     <string name="action_signup">Sign up</string>
     <string name="action_signin">Sign in</string>
+    <string name="show_password">Show</string>
+    <string name="hide_password">Hide</string>
+    
+    <!-- Pesan Validasi -->
     <string name="error_empty_fields">Email dan password tidak boleh kosong!</string>
-    <!-- (Kode sebelumnya tetap ada, tambahkan baris berikut di dalam <resources>) -->
     <string name="error_invalid_email">Format email tidak valid (harus mengandung karakter @)</string>
     <string name="error_invalid_password">Password minimal 8 karakter serta mengandung huruf dan angka</string>
-
-    <!-- Tambahkan string berikut untuk alur Login -> Home -->
     <string name="login_loading">Memverifikasi akun…</string>
+    
+    <!-- Layar Home -->
     <string name="home_welcome_title">Selamat Datang di BrewRatio</string>
     <string name="home_subtitle">Siapkan rasio seduhan terbaikmu hari ini.</string>
     <string name="cd_brand_logo">Logo BrewRatio</string>

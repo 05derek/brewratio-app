@@ -1,20 +1,45 @@
 package com.example.brewratiomobile.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -25,287 +50,344 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.brewratiomobile.R
 import com.example.brewratiomobile.ui.components.CoffeeLogo
-import com.example.brewratiomobile.ui.theme.CopperBrown
-import com.example.brewratiomobile.ui.theme.LightBeige
+import com.example.brewratiomobile.ui.theme.BorderSubtle
+import com.example.brewratiomobile.ui.theme.ButtonDark
+import com.example.brewratiomobile.ui.theme.ErrorPastel
+import com.example.brewratiomobile.ui.theme.EspressoDark
+import com.example.brewratiomobile.ui.theme.SurfaceDark
+import com.example.brewratiomobile.ui.theme.TextMuted
+import com.example.brewratiomobile.ui.theme.WarmGold
 import com.example.brewratiomobile.ui.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
     onNavigateToHome: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: LoginViewModel = viewModel()
 ) {
     val emptyFieldsError = stringResource(id = R.string.error_empty_fields)
     val invalidEmailError = stringResource(id = R.string.error_invalid_email)
     val invalidPasswordError = stringResource(id = R.string.error_invalid_password)
 
+    var passwordVisible by remember { mutableStateOf(false) }
+
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = modifier
+            .fillMaxSize()
+            .background(EspressoDark)
     ) {
+        // 1. Gambar Biji Kopi di bagian atas
         Image(
             painter = painterResource(id = R.drawable.bg_cafe),
             contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.45f)
+                .align(Alignment.TopCenter),
             contentScale = ContentScale.Crop
         )
 
-        Card(
+        // 2. Gradasi Gelap Halus
+        Box(
             modifier = Modifier
-                .fillMaxWidth(0.88f)
-                .wrapContentHeight()
-                .border(
-                    width = dimensionResource(id = R.dimen.border_width_thin),
-                    color = LightBeige.copy(alpha = 0.3f),
-                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius))
-                ),
-            shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
-            colors = CardDefaults.cardColors(
-                containerColor = CopperBrown.copy(alpha = 0.88f)
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+                .fillMaxWidth()
+                .fillMaxHeight(0.5f)
+                .align(Alignment.TopCenter)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            EspressoDark.copy(alpha = 0.5f),
+                            EspressoDark
+                        )
+                    )
+                )
+        )
+
+        // 3. Form Input & Tombol Aksi
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 28.dp, vertical = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = dimensionResource(id = R.dimen.card_padding_horizontal),
-                        vertical = dimensionResource(id = R.dimen.card_padding_vertical)
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CoffeeLogo()
+            Spacer(modifier = Modifier.height(110.dp))
 
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
+            // Logo Cangkir/Infus Kopi
+            CoffeeLogo()
 
-                Text(
-                    text = stringResource(id = R.string.app_name),
-                    fontSize = dimensionResource(id = R.dimen.text_size_app_title).value.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = LightBeige
-                )
+            Spacer(modifier = Modifier.height(10.dp))
 
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_xlarge)))
+            // Brand Tag
+            Text(
+                text = stringResource(id = R.string.brand_name),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 2.5.sp,
+                color = WarmGold
+            )
 
-                AuthTabRow(
-                    isSignInSelected = viewModel.isSignInSelected,
-                    enabled = !viewModel.isLoading,
-                    onTabSelected = { viewModel.toggleAuthMode(it) }
-                )
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_xxlarge)))
-
-                AuthTextField(
-                    label = stringResource(id = R.string.label_email),
-                    value = viewModel.email,
-                    onValueChange = { viewModel.onEmailChanged(it) },
-                    placeholder = stringResource(id = R.string.hint_email),
-                    keyboardType = KeyboardType.Email,
-                    enabled = !viewModel.isLoading,
-                    isError = viewModel.emailError != null,
-                    errorMessage = viewModel.emailError
-                )
-
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
-
-                AuthTextField(
-                    label = stringResource(id = R.string.label_password),
-                    value = viewModel.password,
-                    onValueChange = { viewModel.onPasswordChanged(it) },
-                    placeholder = stringResource(id = R.string.hint_password),
-                    isPassword = true,
-                    keyboardType = KeyboardType.Password,
-                    enabled = !viewModel.isLoading,
-                    isError = viewModel.passwordError != null,
-                    errorMessage = viewModel.passwordError
-                )
-
-                if (viewModel.isSignInSelected) {
-                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_small)))
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                        TextButton(
-                            onClick = { },
-                            enabled = !viewModel.isLoading
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.forgot_password),
-                                color = LightBeige.copy(alpha = 0.75f),
-                                fontSize = 12.sp
-                            )
-                        }
-                    }
+            // Judul Layar: "Sign in" atau "Sign up"
+            Text(
+                text = if (viewModel.isSignInSelected) {
+                    stringResource(id = R.string.login_title)
                 } else {
-                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
-                }
+                    stringResource(id = R.string.signup_title)
+                },
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Serif,
+                color = Color.White
+            )
 
-                if (viewModel.generalError != null) {
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = viewModel.generalError!!,
-                        color = Color(0xFFFFCDD2),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+            Spacer(modifier = Modifier.height(4.dp))
 
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
+            // Subjudul
+            Text(
+                text = if (viewModel.isSignInSelected) {
+                    stringResource(id = R.string.login_subtitle)
+                } else {
+                    stringResource(id = R.string.signup_subtitle)
+                },
+                fontSize = 12.sp,
+                color = TextMuted
+            )
 
-                Button(
-                    onClick = {
-                        viewModel.validateAndSubmit(
-                            emptyMsg = emptyFieldsError,
-                            invalidEmailMsg = invalidEmailError,
-                            invalidPasswordMsg = invalidPasswordError,
-                            onSuccessLogin = { _, _ -> onNavigateToHome() },
-                            onSuccessRegister = { _, _ -> onNavigateToHome() }
-                        )
-                    },
-                    enabled = !viewModel.isLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(dimensionResource(id = R.dimen.button_height)),
-                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.button_corner_radius)),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = LightBeige,
-                        contentColor = CopperBrown,
-                        disabledContainerColor = LightBeige.copy(alpha = 0.7f),
-                        disabledContentColor = CopperBrown
-                    )
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // --- INPUT EMAIL ---
+            AuthInputField(
+                label = stringResource(id = R.string.label_email_caps),
+                value = viewModel.email,
+                onValueChange = { viewModel.onEmailChanged(it) },
+                placeholder = stringResource(id = R.string.hint_email),
+                keyboardType = KeyboardType.Email,
+                enabled = !viewModel.isLoading,
+                errorMessage = viewModel.emailError
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            // --- INPUT PASSWORD ---
+            AuthInputField(
+                label = stringResource(id = R.string.label_password_caps),
+                value = viewModel.password,
+                onValueChange = { viewModel.onPasswordChanged(it) },
+                placeholder = stringResource(id = R.string.hint_password),
+                keyboardType = KeyboardType.Password,
+                isPassword = true,
+                passwordVisible = passwordVisible,
+                onTogglePasswordVisibility = { passwordVisible = !passwordVisible },
+                enabled = !viewModel.isLoading,
+                errorMessage = viewModel.passwordError
+            )
+
+            // Opsi Lupa Password
+            if (viewModel.isSignInSelected) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterEnd
                 ) {
-                    if (viewModel.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(dimensionResource(id = R.dimen.loading_indicator_size)),
-                            color = CopperBrown,
-                            strokeWidth = dimensionResource(id = R.dimen.loading_stroke_width)
-                        )
-                    } else {
+                    Text(
+                        text = stringResource(id = R.string.forgot_password),
+                        color = TextMuted,
+                        fontSize = 11.sp,
+                        modifier = Modifier
+                            .clickable(enabled = !viewModel.isLoading) { }
+                            .padding(vertical = 4.dp)
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.height(14.dp))
+            }
+
+            // Pesan Error Umum (Jika Kolom Kosong)
+            if (viewModel.generalError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = viewModel.generalError!!,
+                    color = ErrorPastel,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // --- TOMBOL PILL "let's started ->" ---
+            Button(
+                onClick = {
+                    viewModel.validateAndSubmit(
+                        emptyMsg = emptyFieldsError,
+                        invalidEmailMsg = invalidEmailError,
+                        invalidPasswordMsg = invalidPasswordError,
+                        onSuccessLogin = { _, _ -> onNavigateToHome() },
+                        onSuccessRegister = { _, _ -> onNavigateToHome() }
+                    )
+                },
+                enabled = !viewModel.isLoading,
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ButtonDark,
+                    contentColor = Color.White,
+                    disabledContainerColor = ButtonDark.copy(alpha = 0.5f),
+                    disabledContentColor = Color.White.copy(alpha = 0.5f)
+                ),
+                border = BorderStroke(1.dp, BorderSubtle),
+                modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .height(52.dp)
+            ) {
+                if (viewModel.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(22.dp),
+                        color = WarmGold,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
                         Text(
                             text = if (viewModel.isSignInSelected) {
-                                stringResource(id = R.string.btn_signin)
+                                stringResource(id = R.string.btn_lets_started)
                             } else {
                                 stringResource(id = R.string.btn_signup)
                             },
-                            fontWeight = FontWeight.Bold,
-                            fontSize = dimensionResource(id = R.dimen.text_size_button).value.sp
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "➔",
+                            fontSize = 16.sp,
+                            color = Color.White
                         )
                     }
                 }
             }
-        }
-    }
-}
 
-@Composable
-private fun AuthTabRow(
-    isSignInSelected: Boolean,
-    enabled: Boolean,
-    onTabSelected: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f)
-        ) {
-            TextButton(
-                onClick = { onTabSelected(true) },
-                enabled = enabled
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- TOGGLE SIGN IN / SIGN UP ---
+            Row(
+                modifier = Modifier.padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(id = R.string.tab_signin),
-                    color = if (isSignInSelected) LightBeige else LightBeige.copy(alpha = 0.5f),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = dimensionResource(id = R.dimen.text_size_tab).value.sp
+                    text = if (viewModel.isSignInSelected) {
+                        stringResource(id = R.string.prompt_no_account)
+                    } else {
+                        stringResource(id = R.string.prompt_have_account)
+                    },
+                    color = TextMuted,
+                    fontSize = 12.sp
                 )
-            }
-            if (isSignInSelected) {
-                Box(modifier = Modifier.width(60.dp).height(2.dp).background(LightBeige))
-            }
-        }
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f)
-        ) {
-            TextButton(
-                onClick = { onTabSelected(false) },
-                enabled = enabled
-            ) {
                 Text(
-                    text = stringResource(id = R.string.tab_signup),
-                    color = if (!isSignInSelected) LightBeige else LightBeige.copy(alpha = 0.5f),
+                    text = if (viewModel.isSignInSelected) {
+                        stringResource(id = R.string.action_signup)
+                    } else {
+                        stringResource(id = R.string.action_signin)
+                    },
+                    color = WarmGold,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    fontSize = dimensionResource(id = R.dimen.text_size_tab).value.sp
+                    modifier = Modifier.clickable(enabled = !viewModel.isLoading) {
+                        viewModel.toggleAuthMode(!viewModel.isSignInSelected)
+                    }
                 )
-            }
-            if (!isSignInSelected) {
-                Box(modifier = Modifier.width(60.dp).height(2.dp).background(LightBeige))
             }
         }
     }
 }
 
+/**
+ * Komponen Input Teks Modular untuk Clean Code & Reusability
+ */
 @Composable
-private fun AuthTextField(
+private fun AuthInputField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    isPassword: Boolean = false,
     keyboardType: KeyboardType,
+    modifier: Modifier = Modifier,
+    isPassword: Boolean = false,
+    passwordVisible: Boolean = false,
+    onTogglePasswordVisibility: (() -> Unit)? = null,
     enabled: Boolean = true,
-    isError: Boolean = false,
     errorMessage: String? = null
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label,
-            color = LightBeige.copy(alpha = 0.95f),
-            fontSize = dimensionResource(id = R.dimen.text_size_label).value.sp,
-            modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.spacing_small)),
-            textAlign = TextAlign.Start
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp,
+            color = TextMuted,
+            modifier = Modifier.padding(bottom = 6.dp, start = 4.dp)
         )
+
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholder, color = LightBeige.copy(alpha = 0.4f)) },
+            placeholder = { Text(placeholder, color = Color(0xFF6B6661), fontSize = 14.sp) },
             singleLine = true,
             enabled = enabled,
-            isError = isError,
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            isError = errorMessage != null,
+            visualTransformation = if (isPassword && !passwordVisible) {
+                PasswordVisualTransformation()
+            } else {
+                VisualTransformation.None
+            },
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            trailingIcon = if (isPassword && onTogglePasswordVisibility != null) {
+                {
+                    Text(
+                        text = if (passwordVisible) {
+                            stringResource(id = R.string.hide_password)
+                        } else {
+                            stringResource(id = R.string.show_password)
+                        },
+                        color = WarmGold,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .padding(end = 12.dp)
+                            .clickable { onTogglePasswordVisibility() }
+                    )
+                }
+            } else null,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(dimensionResource(id = R.dimen.textfield_corner_radius)),
+            shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = LightBeige,
-                unfocusedTextColor = LightBeige,
-                disabledTextColor = LightBeige.copy(alpha = 0.6f),
-                focusedBorderColor = if (isError) Color(0xFFE57373) else LightBeige,
-                unfocusedBorderColor = if (isError) Color(0xFFE57373).copy(alpha = 0.7f) else LightBeige.copy(alpha = 0.4f),
-                disabledBorderColor = LightBeige.copy(alpha = 0.25f),
-                errorBorderColor = Color(0xFFE57373),
-                cursorColor = LightBeige
+                focusedContainerColor = SurfaceDark,
+                unfocusedContainerColor = SurfaceDark,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                disabledTextColor = Color.Gray,
+                focusedBorderColor = if (errorMessage != null) ErrorPastel else WarmGold,
+                unfocusedBorderColor = if (errorMessage != null) ErrorPastel else BorderSubtle,
+                cursorColor = WarmGold
             )
         )
 
-        if (isError && errorMessage != null) {
-            Spacer(modifier = Modifier.height(5.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "• $errorMessage",
-                    color = Color(0xFFFFCDD2),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Normal
-                )
-            }
+        if (errorMessage != null) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "• $errorMessage",
+                color = ErrorPastel,
+                fontSize = 11.sp,
+                modifier = Modifier.padding(start = 6.dp)
+            )
         }
     }
 }
