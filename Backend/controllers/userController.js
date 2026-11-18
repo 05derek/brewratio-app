@@ -57,24 +57,16 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// 3. Hapus Akun Permanen (Delete Account & Cascade Delete - Sesuai SRS REQ-5)
+// 3. Hapus Akun User
 exports.deleteAccount = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const user = await User.findByPk(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: 'Pengguna tidak ditemukan.' });
-    }
-
-    // Menghapus user (akan memicu CASCADE delete ke data CoffeeBeans dan BrewLogs miliknya)
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ message: 'Pengguna tidak ditemukan.' });
+    
+    // Menghapus akun (akan memicu CASCADE delete ke CoffeeBeans dan BrewLogs)
     await user.destroy();
-
-    res.status(200).json({
-      message: 'Akun dan seluruh riwayat data terkait berhasil dihapus secara permanen.'
-    });
+    res.status(200).json({ message: 'Akun dan seluruh data terkait berhasil dihapus.' });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Gagal menghapus akun', error: error.message });
   }
 };

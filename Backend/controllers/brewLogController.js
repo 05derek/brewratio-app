@@ -1,7 +1,7 @@
 const BrewLog = require('../models/BrewLog');
 const CoffeeBean = require('../models/CoffeeBean');
 const BrewMethod = require('../models/BrewMethod');
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize'); 
 
 exports.create = async (req, res) => {
   try {
@@ -22,13 +22,16 @@ exports.getAll = async (req, res) => {
 
 exports.search = async (req, res) => {
   try {
-    const { q } = req.query;
+    const q = req.query.q || '';
     const data = await BrewLog.findAll({
-      where: { user_id: req.user.id },
-      include: [{
-        model: CoffeeBean,
-        where: { bean_name: { [Op.like]: `%${q}%` } }
-      }, BrewMethod]
+      where: {
+        user_id: req.user.id,
+        [Op.or]: [
+          Sequelize.where(Sequelize.cast(Sequelize.col('BrewLog.created_at'), 'CHAR'), { [Op.like]: `%${q}%` }),
+          { '$CoffeeBean.bean_name$': { [Op.like]: `%${q}%` } }
+        ]
+      },
+      include: [CoffeeBean, BrewMethod]
     });
     res.json(data);
   } catch (err) { res.status(500).json({ error: err.message }); }

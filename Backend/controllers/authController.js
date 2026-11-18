@@ -83,7 +83,7 @@ const login = async (req, res) => {
   }
 };
 
-// 3. Fungsi Refresh Token (Sesuai Pedoman Kategori 1)
+// 3. Fungsi Refresh Token (Sesuai Pedoman Kategori 1) - SUDAH DIPERBAIKI
 const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -91,22 +91,25 @@ const refreshToken = async (req, res) => {
       return res.status(401).json({ message: 'Refresh token wajib disertakan.' });
     }
 
-    jwt.verify(refreshToken, JWT_REFRESH_SECRET, async (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ message: 'Refresh token tidak valid atau telah kedaluwarsa.' });
-      }
+    let decoded;
+    try {
+      // Menggunakan await agar jika token invalid/expired, error-nya tertangkap dengan rapi
+      decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+    } catch (err) {
+      return res.status(403).json({ message: 'Refresh token tidak valid atau telah kedaluwarsa.' });
+    }
 
-      const user = await User.findByPk(decoded.id);
-      if (!user) {
-        return res.status(404).json({ message: 'Pengguna tidak ditemukan.' });
-      }
+    const user = await User.findByPk(decoded.id);
+    if (!user) {
+      return res.status(404).json({ message: 'Pengguna tidak ditemukan.' });
+    }
 
-      const newToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1d' });
+    // Terbitkan Access Token baru
+    const newToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1d' });
 
-      res.status(200).json({
-        message: 'Token berhasil diperbarui!',
-        token: newToken
-      });
+    res.status(200).json({
+      message: 'Token berhasil diperbarui!',
+      token: newToken
     });
   } catch (error) {
     console.error(error);
